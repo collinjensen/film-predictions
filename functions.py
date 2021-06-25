@@ -28,10 +28,22 @@ def get_data(url):
 def get_wrangle(url):
     movie_details = get_data(url)
     output = {}
-    output['Year'] = float(movie_details['Year'])
-    output['IMDb'] = float(movie_details['imdbRating'])*10
+    output['Year'] = 0.0
+    output['IMDb'] = 0.0
     output['Rotten Tomatoes'] = 0.0
     output['Metacritic'] = 0.0
+    output['BoxOffice'] = 0.0
+    output['Runtime'] = 0.0
+    output['Rotten Tomatoes'] = 0.0
+    output['Metacritic'] = 0.0
+    if movie_details['Year'] == "N/A":
+        output['Year'] = 0.0
+    else:
+        output['Year'] = float(movie_details['Year'])
+    if movie_details['imdbRating'] == "N/A":
+        output['IMDb'] = 0.0
+    else:
+        output['IMDb'] = float(movie_details['imdbRating'])*10
     if movie_details['BoxOffice'] == "N/A":
         output['BoxOffice'] = 0.0
     if movie_details['BoxOffice'] != "N/A":
@@ -51,10 +63,16 @@ def get_wrangle(url):
     rated_list = [
         'Approved', 'G', 'N/A', 'PG', 'PG-13', 'R', 'TV-14', 'TV-G', 'TV-MA', 'TV-PG', 'Unrated'
     ]
-    output[movie_details['Rated']] = 1.0
-    rated_list.remove(movie_details['Rated'])
-    for rated in rated_list:
-        output[rated] = 0.0
+    if movie_details["Rated"] != "Not Rated":
+        output[movie_details['Rated']] = 1.0
+        rated_list.remove(movie_details['Rated'])
+        for rated in rated_list:
+            output[rated] = 0.0
+    else:
+        output["Unrated"] = 1.0
+        rated_list.remove("Unrated")
+        for rated in rated_list:
+            output[rated] = 0.0
     return [pd.Series(output)]
 
 def make_prediction(movie_url):
