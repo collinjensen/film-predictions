@@ -40,10 +40,17 @@ def get_wrangle(url):
         output['Year'] = 0.0
     else:
         output['Year'] = float(movie_details['Year'])
-    if movie_details['imdbRating'] == "N/A":
-        output['IMDb'] = 0.0
-    else:
-        output['IMDb'] = float(movie_details['imdbRating'])*10
+    ratings_sources = [x["Source"] for x in movie_details["Ratings"]]
+    for i in range(0, len(ratings_sources)):
+        if ratings_sources[i] == "Internet Movie Database":
+            ratings_sources[i] = "IMDb"
+    ratings_values = [x["Value"] for x in movie_details["Ratings"]]
+    for i in range(0, len(ratings_sources)):
+        output[ratings_sources[i]] = ratings_values[i]
+    if len(ratings_sources) != 0:
+        output['IMDb'] = float(output['IMDb'].split('/')[0])*10
+        output['Rotten Tomatoes'] = float(output['Rotten Tomatoes'].strip('%'))
+        output['Metacritic'] = float(output['Metacritic'].split('/')[0])
     if movie_details['BoxOffice'] == "N/A":
         output['BoxOffice'] = 0.0
     if movie_details['BoxOffice'] != "N/A":
